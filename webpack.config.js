@@ -11,10 +11,10 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   plugins: [
-    new Dotenv(), // Add the Dotenv plugin to load environment variables
-    // new webpack.DefinePlugin({
-    //   'process.env': JSON.stringify(process.env) // Inject the environment variables
-    // })
+    // new Dotenv(), // Add the Dotenv plugin to load environment variables
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(process.env) // Inject the environment variables
+    })
   ],
   module: {
     rules: [
