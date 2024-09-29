@@ -124,6 +124,9 @@ export default function ValueBetsDisplay() {
   const [currentPage, setCurrentPage] = useState(1)
   const [minValue, setMinValue] = useState("1.06");
   const [maxValue, setMaxValue] = useState("");
+  const [minDate, setMinDate] = useState("")
+  const [maxDate, setMaxDate] = useState("")
+
 
 
   const [loading, setLoading] = useState<boolean>(true); // State to handle loading
@@ -185,6 +188,11 @@ export default function ValueBetsDisplay() {
     return isNaN(floatVal) ? 100000000 : floatVal;
   };
 
+  const getMaxDate = () => {
+    return maxDate == "" ? "99999" : maxDate;
+  };
+
+
   const filteredAndSortedBets = useMemo(() => {
     return valueBets
       .filter(bet => 
@@ -193,7 +201,9 @@ export default function ValueBetsDisplay() {
         (selectedLeagues.length === 0 || selectedLeagues.includes(bet.League)) &&
         (selectedBetTypes.length === 0 || selectedBetTypes.includes(bet.BetType)) &&
         bet.Value > getMinValue()  &&
-        bet.Value < getMaxValue()
+        bet.Value < getMaxValue() &&
+        bet.Date > minDate  &&
+        bet.Date < getMaxDate()
       )
       .sort((a, b) => {
         if (!sortColumn)  return 0
@@ -203,7 +213,7 @@ export default function ValueBetsDisplay() {
         if (a[sortColumn] > b[sortColumn]) return sortDirection === "asc" ? 1 : -1
         return 0
       })
-  }, [valueBets, search, selectedLeagues, selectedBetTypes, sortColumn, sortDirection,minValue,maxValue])
+  }, [valueBets, search, selectedLeagues, selectedBetTypes, sortColumn, sortDirection,minValue,maxValue,minDate,maxDate])
 
   const paginatedBets = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage
@@ -281,6 +291,20 @@ export default function ValueBetsDisplay() {
           onChange={(e) => setMaxValue(e.target.value)}
           className="px-3 py-2 border rounded-md"
         />
+        <input
+          type="text"
+          placeholder="From Date"
+          value={minDate}
+          onChange={(e) => setMinDate(e.target.value)}
+          className="px-3 py-2 border rounded-md"
+        />
+        <input
+          type="text"
+          placeholder="To Date"
+          value={maxDate}
+          onChange={(e) => setMaxDate(e.target.value)}
+          className="px-3 py-2 border rounded-md"
+        />
       </div>
       <div className="ml-2 mb-4 text-xl font-semibold">
         Total Profit: <span className={totalProfit >= 0 ? "text-green-600" : "text-red-600"}>{totalProfit.toFixed(2)}</span>
@@ -335,9 +359,11 @@ export default function ValueBetsDisplay() {
                 <td className="p-2">{bet.Value.toFixed(2)}</td>
                 <td className={`p-2 font-medium ${
                   bet.Result === 2 ? 'text-yellow-500' :
-                  bet.Result === 1 ? 'text-green-500' : 'text-red-500'
+                  bet.Result === 1 ? 'text-green-500' : 
+                  bet.Result == 0 ? 'text-blue-500' : 'text-red-500'
                 }`}>
-                  {bet.Result === 2 ? 'Pending' : bet.Result === 1 ? 'Won' : 'Lost'}
+                  {bet.Result === 2 ? 'Pending' : (bet.Result === 1 ? 'Won' : (bet.Result == 0 ? "Push" : 'Lost'))}
+
                 </td>
                 <td className="p-2">{bet.Profit.toFixed(2)}</td>
               </tr>
