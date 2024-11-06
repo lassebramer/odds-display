@@ -141,7 +141,8 @@ export default function ValueBetsDisplay() {
       // Fetch data from Supabase's 'valuebets' table
       const { data, error } = await supabase
         .from('ValueBets')
-        .select('*'); // Fetch all columns
+        .select('*')
+        .limit(10000); // Fetch all columns
   
       if (error) {
         console.error("Error fetching data from Supabase:", error.message);
